@@ -1,0 +1,24 @@
+:root {
+    --background: #000;
+    --text-i: #fff;
+}
+
+* {
+    font-family: monospace;
+    font-size: 15px;
+}
+
+body {
+    padding: 12px;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: var(--background);
+    color: var(--text-i)
+}
+
+#secret-input {
+    background: var(--background);
+    color: var(--text-i);
+    border: none;
+    outline: none;
+}
