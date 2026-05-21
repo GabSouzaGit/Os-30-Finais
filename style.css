@@ -22,3 +22,7 @@ body {
     border: none;
     outline: none;
 }
+
+#ENTER_KEY {
+    font-size: 20px;
+}

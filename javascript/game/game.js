@@ -1,6 +1,6 @@
 const FIRST_OPTION = 0;
 const SECOND_OPTION = 1;
-const THIRD_OPTION = 3;
+const THIRD_OPTION = 2;
 
 import { decisionTree } from "./decision_tree.js";
 
@@ -38,7 +38,7 @@ function sendGameCommand(inputValue){
         if(nInputValue == FIRST_OPTION
         || nInputValue == SECOND_OPTION
         || nInputValue == THIRD_OPTION){
-            subtreeReference = subtreeReference.paths[subtreeKeys[nInputValue]];
+            subtreeReference = subtreeReference.paths[nInputValue];
 
             walk()
             return;
@@ -84,11 +84,10 @@ function walk(sub = null){
     }else{
         appendPromptContent(`<span>${subtreeReference.message}</span>`);
 
-        console.log(subtreeReference)
         const currentPaths = Object.keys(subtreeReference.paths);
-        const choiceOptions = `<div>0 - ${subtreeReference.paths[currentPaths[0]].optionMessage}</div>
-                               <div>1 - ${subtreeReference.paths[currentPaths[1]].optionMessage}</div>
-                               <div>2 - ${subtreeReference.paths[currentPaths[2]].optionMessage}</div>`;
+        const choiceOptions = `<div>0 - ${subtreeReference.paths[0].optionMessage}</div>
+                               <div>1 - ${subtreeReference.paths[1].optionMessage}</div>
+                               <div>2 - ${subtreeReference.paths[2].optionMessage}</div>`;
             
         appendPromptContent(tabulation(choiceOptions, 1, true));
         skipLineInPrompt();
