@@ -1,3 +1,27 @@
+/*
+    Caminho:
+
+    {
+        optionMessage: "Texto da opção",
+        message: "Texto de escolha",
+        paths: [
+            {},
+            {},
+            {}
+        ]
+    }
+
+    Final:
+
+    {
+        itsFinal: {
+            finalMessage: "Vila desbloqueada",
+            achievement: "Vila",
+            finalID: 2
+        }
+    }
+*/ 
+
 export const decisionTree = {
     start: true,
     message: "Seja bem vindo ao QTDosRPG Game! Escolha um cenário para a sua aventura.",
@@ -42,36 +66,12 @@ export const decisionTree = {
         },
         {
             optionMessage: "Iniciar na vila",
-            itsFinal: {
-                finalMessage: "Vila desbloqueada",
-                achievement: "Vila",
-                finalID: 2
-            }
+            message: "Você acorda numa vila, cercada por montanhas",
+            paths: [
+                {},
+                {},
+                {},
+            ]
         }
     ]
 }
-
-/*
-    Caminho:
-
-    {
-        message: "Seja bem vindo ao QTDosRPG Game! Escolha um cenário para a sua aventura.",
-        paths: {
-            cave: {...},
-            clearing: {...},
-            village: {...}
-        }
-    }
-*/
-
-/*
-    Final:
-
-    {
-        itsFinal: {
-            finalMessage: "Vila desbloqueada",
-            achievement: "Vila",
-            finalID: 2
-        }
-    }
-*/
