@@ -30,7 +30,7 @@ export function greetings(){
     const QTDOS_GREETINGS = `${color("Seja bem vindo ao QTDOS!", QTDOSHEAL_HEXCOLOR)}<br/>
                                  ${color("Versão 1.0.05.7x64", QTDOSPROCESS_HEXCOLOR)}<br/>
                                  Todos os direitos reservados.<p></p>
-                                 Digite --help para ver os possiveis comandos.<p></p>`;
+                                 Digite --help ou -h para ver os possiveis comandos.<p></p>`;
 
     return QTDOS_GREETINGS;
 }
@@ -98,6 +98,7 @@ export function createSecretInput(eventHandler){
 
     secretInput.type = "text";
     secretInput.id = "secret-input";
+    secretInput.autocomplete = "off";
 
     return secretInput;
 }
