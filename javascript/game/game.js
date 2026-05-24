@@ -31,8 +31,14 @@ function sendGameCommand(inputValue){
 
     currentActiveEntry.innerHTML = `${gameTrack}${inputValue}`;
 
+    if(inputValue === "exit"){
+        exitGameLoopHandler();
+        return;
+    }
+
     const subtreeKeys = Object.keys(subtreeReference.paths);
     const nInputValue = Number(inputValue);
+
 
     if(nInputValue != NaN) {
         if(nInputValue == FIRST_OPTION

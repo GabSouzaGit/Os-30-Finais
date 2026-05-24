@@ -3,44 +3,25 @@ import {
     tabulation, 
     createSecretInput, 
     togglePromptContent, 
-    skipParagraphInPrompt 
+    skipParagraphInPrompt, 
+    appendPromptContent
 } from "./utils.js";
 
 import { gameStart } from "./game/game.js";
 import { color } from "./utils.js";
 
+import { SystemQTDOSPrompt } from "./system/SystemQTDOS.js";
+
 const commandTable = {
     // Comandos de consulta (funções)
-    "--help": () => {
-        const queryCommands = `${color("--help", QTDOSPROCESS_HEXCOLOR)}: Lista de comandos do sistema.<br/>
-                               ${color("--achievements", QTDOSPROCESS_HEXCOLOR)}: Lista de finais obtidos ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                               ${color("--secrets", QTDOSPROCESS_HEXCOLOR)}: Lista de segredos obtidos ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                               ${color("--name", QTDOSPROCESS_HEXCOLOR)}: Exibe o nome atual ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.`;
-    
-        const modCommands = `${color("__NAME", QTDOSTIMEMS_HEXCOLOR)} ${color("seu_nome", QTDOSPROCESS_HEXCOLOR)}: Modifica seu nome no RPG ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>` 
-        
-        const actionCommands = `${color("start_rpg", QTDOSCRITICAL_HEXCOLOR)}: Inicia o jogo.<br/>
-                                ${color("cls", QTDOSCRITICAL_HEXCOLOR)}: Limpa o console (fora do jogo)<br/>
-                                ${color("delete_all", QTDOSCRITICAL_HEXCOLOR)}: Apaga todos os dados (conquistas, segredos, etc.) ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                                ${color("restore", QTDOSCRITICAL_HEXCOLOR)}: Retorna dados comuns para as configurações de fabrica ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.`
-                            
-        const response = `<p></p>
-                            Consulta:<br/>
-                                ${tabulation(queryCommands, 1, true)}<p></p>
-                            Modificação:<br/>
-                                ${tabulation(modCommands, 1, true)}<p></p>
-                            Ação:<br/>
-                                ${tabulation(actionCommands, 1, true)}
-                            `;
-        return response;
-    },
+    "--help":           SystemQTDOSPrompt.q_helpList,
+    "-h":               SystemQTDOSPrompt.q_helpList,
+    "--achievements":   SystemQTDOSPrompt.q_achievements,
 
     // Comandos de ação (procedimentos)
-    "start_rpg": gameStart,
-    "cls": () => {
-        togglePromptContent("");
-        return ""
-    }
+    "start_rpg":        gameStart,
+    "cls":              SystemQTDOSPrompt.a_cls,
+    "restart":          SystemQTDOSPrompt.a_restart
 }
 
 async function sendCommandEvent(inputValue){
@@ -57,14 +38,15 @@ async function sendCommandEvent(inputValue){
                 result = await commandTable[inputValue](); 
             }else{
                 result = commandTable[inputValue]();
-                document.body.innerHTML += result;
+                appendPromptContent(result);
         
                 if(inputValue.startsWith("--")) skipLineInPrompt();
             }
             
         }else{
-            document.body.innerHTML += `Parece que "${inputValue}" não é um comando reconhecido pelo sistema operacional.
-                                    <br/> Digite --help para mais informações.`
+            appendPromptContent(`Parece que "${inputValue}" não é um comando reconhecido pelo sistema operacional.
+                                <br/> Digite --help para mais informações.`);
+
             skipParagraphInPrompt(); 
         }
     }
