@@ -1,36 +1,42 @@
-import { setup } from "./javascript/install/installation.js";
-import boot from "./javascript/boot.js";
+import { boot } from "./javascript/boot.js";
+import { togglePromptContent } from "./javascript/utils.js";
+import { SystemQTDOSManagement, SystemQTDOSSetuping } from "./javascript/system/SystemQTDOS.js";
 
-function completeInstallation(){
-    document.removeEventListener('keypress', clearListenerOnPC);
-    document.removeEventListener('click', clearListenerOnSmartphone);
+const turnOnButton = document.querySelector("#turn-on-button");
 
-    localStorage.setItem('QTDOS_HAS_INSTALLED', '1');
+/*
+function relativeURLFrom(url){
+    const rurl = new URL(url, import.meta.url);
+    return rurl.href;
+}
+const url = relativeURLFrom("./javascript/audios/boot.mp3")
+console.log(url);
+
+const javascriptAudio = new Audio(url);
+javascriptAudio.play();
+    */
+
+async function bootSystemHandler(){
+    const firstAccess = SystemQTDOSManagement.isFirstAcess();
+    
+    await SystemQTDOSSetuping.turnOnPC();
+
+    document.body.classList.remove("body-before-init");
+    togglePromptContent();
+
+    if(firstAccess) await SystemQTDOSSetuping.install(); 
+    else            await SystemQTDOSSetuping.setup();
 
     boot();
 }
 
-function clearListenerOnPC(){
-    completeInstallation();
-}
+turnOnButton.addEventListener('click', async () => {
+    await bootSystemHandler();
+});
 
-function clearListenerOnSmartphone(){
-    completeInstallation();
-}
+document.addEventListener("DOMContentLoaded", async () => {
+    const biosDate = document.querySelector("#bios-date");
+    biosDate.textContent = "Generated at: "+ new Date().toLocaleDateString();
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const firstAccess = localStorage.getItem('QTDOS_HAS_INSTALLED') == null;
-
-    if(firstAccess) { 
-        const setupEnd = await setup(); 
-
-        if(setupEnd){
-            document.addEventListener('click',    clearListenerOnSmartphone);
-            document.addEventListener('keypress', clearListenerOnPC);
-        }
-
-        return;
-    }
-
-    boot();
+    if(SystemQTDOSManagement.itsRestarting()) await bootSystemHandler();
 });

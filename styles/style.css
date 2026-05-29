@@ -1,0 +1,68 @@
+:root {
+    --background: #000;
+    --text-i: #fff;
+}
+
+* {
+    font-family: monospace;
+    font-size: 15px;
+}
+
+body {
+    margin: 0;
+    padding: 12px;
+    box-sizing: border-box;
+    background-color: var(--background);
+    color: var(--text-i);
+}
+
+.body-before-init {
+    padding: 0 !important;
+}
+
+#secret-input {
+    background: var(--background);
+    color: var(--text-i);
+    border: none;
+    outline: none;
+}
+
+#turn-on {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#turn-on-advise {
+    padding: 12px 24px;
+    text-align: center;
+}
+
+#turn-on #turn-on-button {
+    background: #fff;
+    cursor: pointer;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+    align-items: center;
+    transition: 0.5s all;
+}
+
+#turn-on #turn-on-button:hover {
+    transform: translateY(-3px);
+}
+
+#turn-on-wait-screen {
+    height: 100vh;
+    width: 100vw;
+    position: absolute;
+    background: var(--background);
+    z-index: 5;
+}
+
+.hide {
+    display: none !important;
+}

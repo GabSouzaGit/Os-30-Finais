@@ -54,7 +54,7 @@ export function skipParagraphInPrompt(){
  * @description Substitui todo o conteudo do prompt por outro elemento ou texto.
  * @param {string} html Conteudo HTML que vai substituir o conteúdo.
  */
-export function togglePromptContent(html){
+export function togglePromptContent(html = ""){
     document.body.innerHTML = html;
 }
 

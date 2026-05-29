@@ -1,0 +1,61 @@
+body {
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+}
+
+.bios-container {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.bios-header {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.energy-star {
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    padding: 10px;
+    font-size: 10px;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.system-info {
+    flex-grow: 1;
+}
+
+.info-line {
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.highlight {
+    color: #ffffff;
+}
+
+.blink {
+    animation: blinker 1.0s steps(1) infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
+
+.bios-footer {
+    border-top: 1px solid #444444;
+    padding-top: 20px;
+    font-size: 14px;
+}
+
+.footer-line {
+    margin-bottom: 5px;
+}

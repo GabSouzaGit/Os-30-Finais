@@ -1,6 +1,12 @@
 import { 
+    installationLogs,
+    setupLogs
+} from "../install/logs.js";
+
+import { 
     togglePromptContent,
     color,
+    sleep,
     tabulation, 
     appendPromptContent
 } from "../utils.js";
@@ -27,6 +33,8 @@ function command(commandsep, description){
     return color(commandsep[0], QTDOSCRITICAL_HEXCOLOR);
 }
 
+export class SystemQTDOSSound {}
+
 export class SystemQTDOSPrompt {
     static a_cls(){
         togglePromptContent("");
@@ -34,7 +42,7 @@ export class SystemQTDOSPrompt {
     }
 
     static a_restart(){
-        localStorage.removeItem("QTDOS_HAS_INSTALLED");
+        SystemQTDOSManagement.dispatchRestart();
         window.location.reload();
     }
 
@@ -80,6 +88,121 @@ export class SystemQTDOSPrompt {
     }
 }
 
-export class SystemQTDOSManagement {
+export class SystemQTDOSSetuping {
+    static async turnOnPC(){
+        const turnOnWaitScreen = document.querySelector("#turn-on-wait-screen");
+        const biosScreen = document.querySelector(".bios-container");
+        const biosStylesheet = document.querySelector("#bios-stylesheet");
+        
+        turnOnWaitScreen.classList.remove("hide");
+        
+        await sleep(1000);
+        
+        turnOnWaitScreen.classList.add("hide");
+        biosScreen.classList.remove("hide");
 
+        await sleep(2000);
+
+        biosScreen.classList.add("hide");
+        turnOnWaitScreen.classList.remove("hide");
+
+        await sleep(1500);
+
+        turnOnWaitScreen.remove();
+        biosScreen.remove();
+        biosStylesheet.remove();
+        // Alcançar 26 segundos de inicialização (sincronizados com o som de inicialização).
+    }
+
+    static install(){
+        return new Promise(async (resolve) => {
+            const initDisplayer = document.createElement("div");
+            document.body.appendChild(initDisplayer);
+        
+            for(let i = 0; i < installationLogs.length; i++){
+                const [log, ms, tab] = installationLogs[i];
+                
+                if(tab > 0) initDisplayer.innerHTML += tabulation(log, tab);
+                else initDisplayer.innerHTML += log;
+        
+                initDisplayer.innerHTML += "<br/>";
+        
+                window.scrollTo(0, document.body.scrollHeight);
+        
+                await sleep(ms);
+            }
+
+            SystemQTDOSManagement.completeSetup(
+                {
+                    installation: true, 
+                    resolve
+                }
+            );
+        });
+    }
+
+    static setup(){
+        return new Promise(async (resolve) => {
+            const initDisplayer = document.createElement("div");
+            document.body.appendChild(initDisplayer);
+        
+            for(let i = 0; i < setupLogs.length; i++){
+                const [log, ms, tab] = setupLogs[i];
+                
+                if(tab > 0) initDisplayer.innerHTML += tabulation(log, tab);
+                else initDisplayer.innerHTML += log;
+        
+                initDisplayer.innerHTML += "<br/>";
+        
+                window.scrollTo(0, document.body.scrollHeight);
+        
+                await sleep(ms);
+            }
+
+            SystemQTDOSManagement.completeSetup(
+                {
+                    installation: false, 
+                    resolve
+                }
+            );
+        });
+    }
+}
+
+export class SystemQTDOSManagement {
+    static QTDOS_HAS_INSTALLED_MEMKEY = "QTDOS_HAS_INSTALLED";
+    static QTDOS_RESTART_KEY = "QTDOS_RESTART";
+
+    static QTDOS_COOKIE_SESSION_KEY = "qtdos_active";
+    static QTDOS_COOKIE_EXPIRATION = 24; // Em horas
+
+    static isFirstAcess(){
+        return localStorage.getItem(SystemQTDOSManagement.QTDOS_HAS_INSTALLED_MEMKEY) == null;
+    }
+
+    static dispatchRestart(){
+        localStorage.setItem(SystemQTDOSManagement.QTDOS_RESTART_KEY, "1");
+    }
+
+    static itsRestarting(){
+        const restart = localStorage.getItem(SystemQTDOSManagement.QTDOS_RESTART_KEY) != null; 
+        
+        if(restart) localStorage.removeItem(SystemQTDOSManagement.QTDOS_RESTART_KEY);
+
+        return restart;
+    }
+
+    static completeSetup({ installation, resolve }){
+        const ready = () => {
+            document.removeEventListener('keypress', ready);
+            document.removeEventListener('click', ready);
+
+            if(installation) localStorage.setItem(SystemQTDOSManagement.QTDOS_HAS_INSTALLED_MEMKEY, '1');
+
+            resolve();
+        }
+
+        document.addEventListener('click', ready);
+        document.addEventListener('keypress', ready);
+    }
 }

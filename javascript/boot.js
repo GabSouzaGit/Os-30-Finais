@@ -1,4 +1,4 @@
-import { greetings } from "./utils.js";
+import { greetings, sleep } from "./utils.js";
 import { waitSystemCommand } from "./interpreter.js";
 
 function qtdosPromptActiveEventHandler(){
@@ -8,7 +8,7 @@ function qtdosPromptActiveEventHandler(){
 
 document.addEventListener('click', qtdosPromptActiveEventHandler)
 
-export default function boot(){
+export function boot(){
     document.body.innerHTML = greetings();
     waitSystemCommand();
 }

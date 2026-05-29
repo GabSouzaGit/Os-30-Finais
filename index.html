@@ -3,12 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/bios.css" id="bios-stylesheet">
     <script src="javascript/globals.js"></script>
     <title> Os 30 Finais - Gabriel Souza </title>
 </head>
-<body>
-    <!--Conteudo dinamico-->
+<body class="body-before-init">
+    <!--TEMP HTML-->
+    <div id="turn-on-wait-screen" class="hide"></div>
+    <div class="bios-container hide">  
+        <header class="bios-header">
+            <div class="energy-star">
+                <div>║█║ █ ║█║</div>
+                <div>ENERGY SAVER</div>
+                <div>────────────</div>
+                <div>QTDOS INSIDE</div>
+            </div>
+        </header>
+        <main class="system-info">
+            <div class="info-line">QTDOS ROM BIOS v1.0.0-RELEASE</div>
+            <div class="info-line">Copyright (C) 2026 QT-SYSTEMS INCORPORATED.</div>
+            <div class="info-line">All Rights Reserved.</div>
+            <br>
+            <div class="info-line">CPU: GenuineQT x86_64 Processor @ 3.20GHz</div>
+            <br>
+            <div class="info-line">Checking RAM : <span class="highlight">2097152K OK</span></div>
+            <br>
+            <div class="info-line">Detecting Primary Master ... QEMU HARDDISK 20GB</div>
+            <div class="info-line">Detecting Primary Slave  ... None</div>
+            <div class="info-line">File System Type Detected: <span class="highlight">OCTFS Core</span></div>
+            <br>
+            <div class="info-line">WAIT<span class="blink">...</span></div>
+        </main>
+
+        <footer class="bios-footer">
+            <div class="footer-line">Press <span class="highlight">DEL</span> to enter SETUP , <span class="highlight">ESC</span> to skip memory test</div>
+            <div class="footer-line" style="color: #666666;"><span id="bios-date"></span>-QT-VirtualMachine-Rehab-Studio</div>
+        </footer>
+    </div>
+    <!--END TEMP-->
+    <div id="turn-on">
+        <div id="turn-on-button"> Ligar máquina </div>
+        <div id="turn-on-advise"> (.✦ ݁˖ Jogue no F11 e com fones de ouvido para melhor experiencia ‹𝟹) </div>
+    </div>
 </body>
 <script type="module" src="init.js"></script>
 </html>
