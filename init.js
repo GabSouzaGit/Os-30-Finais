@@ -4,18 +4,6 @@ import { SystemQTDOSManagement, SystemQTDOSSetuping } from "./javascript/system/
 
 const turnOnButton = document.querySelector("#turn-on-button");
 
-/*
-function relativeURLFrom(url){
-    const rurl = new URL(url, import.meta.url);
-    return rurl.href;
-}
-const url = relativeURLFrom("./javascript/audios/boot.mp3")
-console.log(url);
-
-const javascriptAudio = new Audio(url);
-javascriptAudio.play();
-    */
-
 async function bootSystemHandler(){
     const firstAccess = SystemQTDOSManagement.isFirstAcess();
     
@@ -31,6 +19,16 @@ async function bootSystemHandler(){
 }
 
 turnOnButton.addEventListener('click', async () => {
+    function relativeURLFrom(url){
+        const rurl = new URL(url, import.meta.url);
+        return rurl.href;
+    }
+    const url = relativeURLFrom("./javascript/audios/boot.mp3")
+    console.log(url);
+
+    const javascriptAudio = new Audio(url);
+    javascriptAudio.play();
+
     await bootSystemHandler();
 });
 
