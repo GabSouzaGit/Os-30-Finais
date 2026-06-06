@@ -33,7 +33,30 @@ function command(commandsep, description){
     return color(commandsep[0], QTDOSCRITICAL_HEXCOLOR);
 }
 
-export class SystemQTDOSSound {}
+function relativeURL(url){
+    const rurl = new URL(url, import.meta.url);
+    return rurl.href;
+}
+
+export class SystemQTDOSSound {
+    static TURNON_PC = "../audios/turnon.mp3";
+    static KEYPRESSING = "";
+    static ENTER_PRESS = "";
+    static PC_IDLE = "";
+    static PC_WARN = "";
+    static PC_SUCESS = "";
+    static PC_ERROR = "";
+
+    static play(url){
+        const javascriptAudio = new Audio(url);
+        javascriptAudio.play();
+    }
+
+    static callTurnOnPCSong(){
+        const url = relativeURL(SystemQTDOSSound.TURNON_PC);
+        SystemQTDOSSound.play(url);
+    }
+}
 
 export class SystemQTDOSPrompt {
     static a_cls(){
@@ -90,6 +113,18 @@ export class SystemQTDOSPrompt {
 
 export class SystemQTDOSSetuping {
     static async turnOnPC(){
+        const showBiosScreen = () => {
+            turnOnWaitScreen.classList.add("hide");
+            biosScreen.classList.remove("hide");
+        }
+
+        const showWaitingScreen = () => {
+            biosScreen.classList.add("hide");
+            turnOnWaitScreen.classList.remove("hide");
+        }
+
+        SystemQTDOSSound.callTurnOnPCSong();
+
         const turnOnWaitScreen = document.querySelector("#turn-on-wait-screen");
         const biosScreen = document.querySelector(".bios-container");
         const biosStylesheet = document.querySelector("#bios-stylesheet");
@@ -97,14 +132,10 @@ export class SystemQTDOSSetuping {
         turnOnWaitScreen.classList.remove("hide");
         
         await sleep(1000);
-        
-        turnOnWaitScreen.classList.add("hide");
-        biosScreen.classList.remove("hide");
+            showBiosScreen();
 
         await sleep(2000);
-
-        biosScreen.classList.add("hide");
-        turnOnWaitScreen.classList.remove("hide");
+            showWaitingScreen();
 
         await sleep(1500);
 
@@ -147,16 +178,20 @@ export class SystemQTDOSSetuping {
             document.body.appendChild(initDisplayer);
         
             for(let i = 0; i < setupLogs.length; i++){
-                const [log, ms, tab] = setupLogs[i];
+                const [log, ms, tab, asyncProcedure] = setupLogs[i];
                 
                 if(tab > 0) initDisplayer.innerHTML += tabulation(log, tab);
                 else initDisplayer.innerHTML += log;
-        
+
                 initDisplayer.innerHTML += "<br/>";
-        
                 window.scrollTo(0, document.body.scrollHeight);
-        
-                await sleep(ms);
+
+                if(asyncProcedure == undefined){
+                    await sleep(ms);
+                    continue;
+                }
+                
+                await asyncProcedure(); // Função personalizada do log
             }
 
             SystemQTDOSManagement.completeSetup(

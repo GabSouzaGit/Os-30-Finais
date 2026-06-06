@@ -18,19 +18,7 @@ async function bootSystemHandler(){
     boot();
 }
 
-turnOnButton.addEventListener('click', async () => {
-    function relativeURLFrom(url){
-        const rurl = new URL(url, import.meta.url);
-        return rurl.href;
-    }
-    const url = relativeURLFrom("./javascript/audios/boot.mp3")
-    console.log(url);
-
-    const javascriptAudio = new Audio(url);
-    javascriptAudio.play();
-
-    await bootSystemHandler();
-});
+turnOnButton.addEventListener('click', async () => await bootSystemHandler());
 
 document.addEventListener("DOMContentLoaded", async () => {
     const biosDate = document.querySelector("#bios-date");

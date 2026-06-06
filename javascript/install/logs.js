@@ -1,5 +1,43 @@
 import { color } from "../utils.js";
 
+/**
+ * Estrutura de log:
+ * 
+ * [
+ *      "Mensagem";
+ *      number: tempo em milissegundos;
+ *      number: tabulação;
+ *      async function: função personalizada do log;
+ * ]
+ */
+
+async function buildPromptAnimation(){
+    const racingLoad = "|/-\\".split("");
+    const spanLoading = document.querySelector("#temp-prompt-building");
+
+    return new Promise((resolve) => {
+        const mms = 3000;
+        let loadingControll = 0;
+        let charIterator = 0;
+
+        let itn = setInterval(() => {
+            console.log(loadingControll);
+            
+            charIterator = charIterator == racingLoad.length ? 0 : charIterator;
+            const loadChar = racingLoad[charIterator];
+            spanLoading.textContent = `${loadChar} - Construindo cliente de prompt.`;
+
+            if(loadingControll == mms){
+                clearInterval(itn);
+                resolve();
+            }
+
+            loadingControll++;
+            charIterator++;
+        }, 1)
+    });
+}
+
 export const installationLogs = [
  // [Texto, milissegundos, tabulação]
     ["Inicializando QTDSystemOS...", 3000, 0],
@@ -88,5 +126,6 @@ export const setupLogs = [
         [color("-- undiscovered_outcomes.oct",  QTDOSPROCESS_HEXCOLOR),     50, 1],
     ["<p></p>", 1, 0],
     [`Bibliotecas encontradas: 15 ${color("(0 restantes)", QTDOSHEAL_HEXCOLOR)}`, 100, 0], 
+    [`<span id="temp-prompt-building"></span>`, 0, 0, buildPromptAnimation],
     [`${color(`[${Date.now()}]`, QTDOSTIMEMS_HEXCOLOR)} ${color("qtdos systemd:", QTDOSPROCESS_HEXCOLOR)} Shell inicializado. Bem vindo ao QTDOS. Pressione na tela ou qualquer tecla para iniciar.`, 1, 0],
 ]
