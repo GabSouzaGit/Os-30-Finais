@@ -14,10 +14,9 @@ import {
 /**
  * 
  * @param {string[]} commandsep 
- * @param {string} description 
  * @returns 
  */
-function command(commandsep, description){
+function command(commandsep){
     if(commandsep.length == 2){
         if(commandsep[0].startsWith("__")){
             const mod = `${color(commandsep[0], QTDOSTIMEMS_HEXCOLOR)} ${color(commandsep[1], QTDOSPROCESS_HEXCOLOR)}`;
@@ -39,23 +38,33 @@ function relativeURL(url){
 }
 
 export class SystemQTDOSSound {
-    static TURNON_PC = "../audios/turnon.mp3";
-    static KEYPRESSING = "";
-    static ENTER_PRESS = "";
-    static PC_IDLE = "";
-    static PC_WARN = "";
-    static PC_SUCESS = "";
-    static PC_ERROR = "";
+    static BASE_DIR = "../audios";
+    static AUDIOS = [
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}/turnon.mp3`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}/keypressing.mp3`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}/enter keypressing.mp3`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}`)),
+        new Audio(relativeURL(`${SystemQTDOSSound.BASE_DIR}`)),
+    ];
 
-    static play(url){
-        const javascriptAudio = new Audio(url);
-        javascriptAudio.play();
+    static PC_TURNON = 0;
+    static KEYPRESSING = 1;
+    static ENTER_PRESS = 2;
+    static PC_IDLE = 3;
+    static PC_WARN = 4;
+    static PC_SUCESS = 5;
+    static PC_ERROR = 6;
+
+    static call(audioIndex){
+        const audioObject = SystemQTDOSSound.AUDIOS[audioIndex];
+        audioObject.currentTime = 0;
+        
+        audioObject.play();
     }
 
-    static callTurnOnPCSong(){
-        const url = relativeURL(SystemQTDOSSound.TURNON_PC);
-        SystemQTDOSSound.play(url);
-    }
+    static loop(){}
 }
 
 export class SystemQTDOSPrompt {
@@ -69,19 +78,24 @@ export class SystemQTDOSPrompt {
         window.location.reload();
     }
 
+    static a_shutdown(){
+        SystemQTDOSManagement.destroyCookieSession();
+        window.location.reload();
+    }
+
     static q_helpList(){
         const queryCommands = `${command(["--help"])}: Lista de comandos do sistema.<br/>
                                ${command(["--achievements"])}: Lista de finais obtidos.<br/>
                                ${command(["--secrets"])}: Lista de segredos obtidos ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                               ${command(["--name"])}: Exibe o nome atual ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.`;
+                               ${command(["--whoami"])}: Exibe o nome atual.`;
         
-        const modCommands = `${command(["__NAME", "seu nome"])}: Modifica seu nome no RPG ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>` 
+        const modCommands = `${command(["__NAME", "seu nome"])}: Modifica seu nome no RPG.<br/>` 
         
         const actionCommands = `${command(["start_rpg"])}: Inicia o jogo.<br/>
                                 ${command(["cls"])}: Limpa o console (fora do jogo).<br/>
                                 ${command(["restart"])}: Reinicia o QTDOS.<br>
-                                ${command(["delete_all"])}: Apaga todos os dados (conquistas, segredos, etc.) ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                                ${command(["restore"])}: Retorna dados comuns para as configurações de fabrica ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.`
+                                ${command(["shutdown"])}: Desliga o computador.<br/>
+                                `
                             
         const response = `<p></p>
                             Consulta:<br/>
@@ -93,6 +107,10 @@ export class SystemQTDOSPrompt {
                             `;
         return response;
     } 
+
+    static q_whoami(){
+        return SystemQTDOSManagement.getUsername();
+    }
 
     static q_achievements(){
         appendPromptContent("<p>FINAIS JÁ ENCONTRADOS:</p>");
@@ -109,6 +127,25 @@ export class SystemQTDOSPrompt {
 
         return completeHTML;
     }
+
+    static m_name(name){
+        const regex = /[^A-Za-z0-9]/g;
+
+        if(name == "-h") return `<p>Modifique seu nome com este comando. Algumas informações:</p>
+                                ${color("* Seu nome precisa ter de 2 a 30 caracteres", QTDOSCRITICAL_HEXCOLOR)}<br/>
+                                ${color("* Nada de caracteres especiais!", QTDOSCRITICAL_HEXCOLOR)}
+                                <p>E só :)</p>
+                                `;
+
+        if(name.length < 2) return "Mas ai também não dá... (¬_¬)"
+        if(name.length > 30) return "Vamo diminuir esse nome ai meu camarada? ¯\\_(ツ)_/¯";
+        if(regex.test(name)) return "Pode ir arrumando isso... ( -_•)╦̵̵̿╤─";
+
+
+        SystemQTDOSManagement.editUsername(name);
+
+        return "Nome modificado com sucesso!";
+    }
 }
 
 export class SystemQTDOSSetuping {
@@ -123,7 +160,9 @@ export class SystemQTDOSSetuping {
             turnOnWaitScreen.classList.remove("hide");
         }
 
-        SystemQTDOSSound.callTurnOnPCSong();
+        SystemQTDOSSound.call(
+            SystemQTDOSSound.PC_TURNON
+        );
 
         const turnOnWaitScreen = document.querySelector("#turn-on-wait-screen");
         const biosScreen = document.querySelector(".bios-container");
@@ -207,9 +246,12 @@ export class SystemQTDOSSetuping {
 export class SystemQTDOSManagement {
     static QTDOS_HAS_INSTALLED_MEMKEY = "QTDOS_HAS_INSTALLED";
     static QTDOS_RESTART_KEY = "QTDOS_RESTART";
+    static QTDOS_USERNAME_KEY = "QTDOS_USERNAME";
 
-    static QTDOS_COOKIE_SESSION_KEY = "qtdos_active";
+    static QTDOS_COOKIE_SESSION_KEY = "qtdos_active_cookie";
+    static QTDOS_COOKIE_FLAG = "1";
     static QTDOS_COOKIE_EXPIRATION = 24; // Em horas
+    static QTDOS_COOKIE_HEADER = "path=/; SameSite=Strict; Secure"
 
     static isFirstAcess(){
         return localStorage.getItem(SystemQTDOSManagement.QTDOS_HAS_INSTALLED_MEMKEY) == null;
@@ -239,5 +281,52 @@ export class SystemQTDOSManagement {
 
         document.addEventListener('click', ready);
         document.addEventListener('keypress', ready);
+    }
+
+    static defineCookieSession(){
+        const cookieName = SystemQTDOSManagement.QTDOS_COOKIE_SESSION_KEY;
+        const cookieValue = SystemQTDOSManagement.QTDOS_COOKIE_FLAG;
+        const cookieHeader = SystemQTDOSManagement.QTDOS_COOKIE_HEADER;
+
+        const expires = new Date().getTime() + SystemQTDOSManagement.QTDOS_COOKIE_EXPIRATION * 60 * 1000;
+
+        const cookieMeta = `${cookieName}=${cookieValue}; ${expires}; ${cookieHeader}`;
+
+        document.cookie = cookieMeta;
+    }
+
+    static cookieExists(){
+        const cookies = decodeURIComponent(document.cookie).split(";");
+
+        for(let i = 0; i < cookies.length; i++){
+            const currentCookieID = cookies[i]
+                                    .trim()
+                                    .split("=")[0]; // Primeiro indice do cookie=value (id do cookie)
+
+            if(currentCookieID == SystemQTDOSManagement.QTDOS_COOKIE_SESSION_KEY){
+                return true
+            }
+        }
+
+        return false;
+    }
+
+    static destroyCookieSession(){
+        const cookieName = SystemQTDOSManagement.QTDOS_COOKIE_SESSION_KEY;
+        document.cookie = `${cookieName}=; max-age=0; ${SystemQTDOSManagement.QTDOS_COOKIE_HEADER}`;
+    }
+
+    static giveBasicUserProfile(){
+        if(localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY) == undefined){
+            localStorage.setItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY, "guest");
+        }
+    }
+
+    static editUsername(name){
+        localStorage.setItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY, name);
+    }
+
+    static getUsername(){
+        return localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY);
     }
 }

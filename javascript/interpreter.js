@@ -10,18 +10,49 @@ import {
 import { gameStart } from "./game/game.js";
 import { color } from "./utils.js";
 
-import { SystemQTDOSPrompt } from "./system/SystemQTDOS.js";
+import { SystemQTDOSManagement, SystemQTDOSPrompt, SystemQTDOSSound } from "./system/SystemQTDOS.js";
+
+const modificationTable = {
+    // Comandos de modificação (funções)
+    "__NAME":           SystemQTDOSPrompt.m_name,
+}
 
 const commandTable = {
     // Comandos de consulta (funções)
     "--help":           SystemQTDOSPrompt.q_helpList,
     "-h":               SystemQTDOSPrompt.q_helpList,
     "--achievements":   SystemQTDOSPrompt.q_achievements,
+    "--whoami":         SystemQTDOSPrompt.q_whoami,
 
     // Comandos de ação (procedimentos)
     "start_rpg":        gameStart,
     "cls":              SystemQTDOSPrompt.a_cls,
-    "restart":          SystemQTDOSPrompt.a_restart
+    "restart":          SystemQTDOSPrompt.a_restart,
+    "shutdown":         SystemQTDOSPrompt.a_shutdown,
+
+    // Opções de desenvolvedor
+    "**dev-opt[flush]": () => {
+        const storagelen = localStorage.length;
+
+        for(let i = 0; i < storagelen; i++){
+            const local = localStorage.key(i);
+            
+            console.log(local);
+
+            if(local == null) continue;
+            if(local.startsWith("QTDOS")) localStorage.removeItem(local);
+        }
+
+        SystemQTDOSManagement.destroyCookieSession();
+        window.location.reload();
+    }
+}
+
+function defaultPromptErrorMessage(inputValue){
+    appendPromptContent(`Parece que "${inputValue}" não é um comando reconhecido pelo sistema operacional.
+                        <br/> Digite --help para mais informações.`);
+
+    skipParagraphInPrompt(); 
 }
 
 async function sendCommandEvent(inputValue){
@@ -29,25 +60,35 @@ async function sendCommandEvent(inputValue){
     currentActiveEntry.id = "";
 
     currentActiveEntry.innerHTML = `${systemTrack}${inputValue}`;
-
+    
+    let result = null;
+    
     if(inputValue != ""){
-        if(Object.hasOwn(commandTable, inputValue)){
-            let result = null;
-
-            if(inputValue == "start_rpg"){
-                result = await commandTable[inputValue](); 
-            }else{
-                result = commandTable[inputValue]();
-                appendPromptContent(result);
+        const [ flag, value ] = inputValue.split(" ");
         
-                if(inputValue.startsWith("--")) skipLineInPrompt();
-            }
-            
-        }else{
-            appendPromptContent(`Parece que "${inputValue}" não é um comando reconhecido pelo sistema operacional.
-                                <br/> Digite --help para mais informações.`);
+        if(value == undefined){
+            if(Object.hasOwn(commandTable, flag)){
+                if(flag == "start_rpg"){
+                    result = await commandTable[flag](); 
+                }
+                else{    
+                    result = commandTable[flag]();
+                    appendPromptContent(result);
+                }
 
-            skipParagraphInPrompt(); 
+                console.log(flag);
+                
+                if(flag.startsWith("--")) skipLineInPrompt();
+
+            } else defaultPromptErrorMessage(inputValue);
+        }else{
+            if(Object.hasOwn(modificationTable, flag)){
+                result = modificationTable[flag](value);
+                appendPromptContent(result);
+
+                if(flag.startsWith("__")) skipLineInPrompt();
+
+            } else defaultPromptErrorMessage(inputValue);
         }
     }
 
@@ -56,18 +97,19 @@ async function sendCommandEvent(inputValue){
 
 export function waitSystemCommand(){
     const secretInput = createSecretInput(sendCommandEvent);
-
-    const spanInput = document.createElement("span");
-    spanInput.textContent = systemTrack;
-    spanInput.id = "active-entry";
-
-    spanInput.appendChild(secretInput);
-    document.body.appendChild(spanInput);
-
+    
+    const divInput = document.createElement("div");
+    const track = document.createElement("div");
+    track.textContent = systemTrack;
+    divInput.id = "active-entry";
+    
+    divInput.appendChild(track);
+    divInput.appendChild(secretInput);
+    document.body.appendChild(divInput);
+    
     skipLineInPrompt();
 
     window.scrollTo(0, document.body.scrollHeight);
-
-    const input = document.querySelector("#secret-input");
-    input.focus();
+    
+    secretInput.focus();
 }

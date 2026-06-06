@@ -5,6 +5,8 @@ import { SystemQTDOSManagement, SystemQTDOSSetuping } from "./javascript/system/
 const turnOnButton = document.querySelector("#turn-on-button");
 
 async function bootSystemHandler(){
+    SystemQTDOSManagement.defineCookieSession();
+
     const firstAccess = SystemQTDOSManagement.isFirstAcess();
     
     await SystemQTDOSSetuping.turnOnPC();
@@ -12,9 +14,12 @@ async function bootSystemHandler(){
     document.body.classList.remove("body-before-init");
     togglePromptContent();
 
+    SystemQTDOSManagement.giveBasicUserProfile();
+
     if(firstAccess) await SystemQTDOSSetuping.install(); 
     else            await SystemQTDOSSetuping.setup();
 
+    SystemQTDOSManagement.defineCookieSession();
     boot();
 }
 
@@ -24,5 +29,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const biosDate = document.querySelector("#bios-date");
     biosDate.textContent = "Generated at: "+ new Date().toLocaleDateString();
 
-    if(SystemQTDOSManagement.itsRestarting()) await bootSystemHandler();
+    if(SystemQTDOSManagement.itsRestarting()) {
+        await bootSystemHandler();
+        return;
+    }
+
+    if(SystemQTDOSManagement.cookieExists()){
+        boot();
+    }
 });

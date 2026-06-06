@@ -1,3 +1,5 @@
+import { SystemQTDOSSound } from "./system/SystemQTDOS.js";
+
 /**
  * 
  * @param {string} text Texto que será colorido.
@@ -39,14 +41,16 @@ export function greetings(){
  * @description Pula uma linha no prompt atual.
  */
 export function skipLineInPrompt(){
-    document.body.innerHTML += "<br/>"
+    const br = document.createElement("br");
+    document.body.appendChild(br);
 }
 
 /**
  * @description Pula parágrafo no prompt atual.
  */
 export function skipParagraphInPrompt(){
-    document.body.innerHTML += "<p></p>";
+    const p = document.createElement("p");
+    document.body.appendChild(p);
 }
 
 /**
@@ -83,18 +87,30 @@ export function tabulation(html, tab, stacked = false){
 export function createSecretInput(eventHandler){
     const secretInput = document.createElement('input');
 
+    function keyPressingSoundHandler(event){
+        SystemQTDOSSound.call(
+            SystemQTDOSSound.KEYPRESSING
+        );
+    }
+
     function handlerWrapper(event){
          if(event.key == "Enter") {
+            SystemQTDOSSound.call(
+                SystemQTDOSSound.ENTER_PRESS
+            );
+
             const input = document.querySelector("#secret-input");
             const value = input.value;
 
             eventHandler(value.trim());
                          
             document.removeEventListener("keypress", handlerWrapper);
+            input.removeEventListener("input", keyPressingSoundHandler);
         }
     }
     
     document.addEventListener("keypress", handlerWrapper);
+    secretInput.addEventListener("input", keyPressingSoundHandler);
 
     secretInput.type = "text";
     secretInput.id = "secret-input";

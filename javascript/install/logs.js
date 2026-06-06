@@ -16,7 +16,7 @@ async function buildPromptAnimation(){
     const spanLoading = document.querySelector("#temp-prompt-building");
 
     return new Promise((resolve) => {
-        const mms = 3000;
+        const mms = 300;
         let loadingControll = 0;
         let charIterator = 0;
 
@@ -34,7 +34,7 @@ async function buildPromptAnimation(){
 
             loadingControll++;
             charIterator++;
-        }, 1)
+        }, 100)
     });
 }
 

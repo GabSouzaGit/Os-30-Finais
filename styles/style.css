@@ -20,11 +20,17 @@ body {
     padding: 0 !important;
 }
 
+#active-entry {
+    display: flex;
+    width: 100%;
+}
+
 #secret-input {
     background: var(--background);
     color: var(--text-i);
     border: none;
     outline: none;
+    flex-grow: 1;
 }
 
 #turn-on {
