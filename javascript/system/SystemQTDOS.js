@@ -29,7 +29,15 @@ function command(commandsep){
         return color(commandsep[0], QTDOSPROCESS_HEXCOLOR);
     }
 
+    if(commandsep[0].startsWith("/")){
+        return color(commandsep[0], QTDOSSPECIAL_HEXCOLOR);
+    }
+
     return color(commandsep[0], QTDOSCRITICAL_HEXCOLOR);
+}
+
+function developing(){
+    return `${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}`;
 }
 
 function relativeURL(url){
@@ -84,18 +92,23 @@ export class SystemQTDOSPrompt {
     }
 
     static q_helpList(){
-        const queryCommands = `${command(["--help"])}: Lista de comandos do sistema.<br/>
-                               ${command(["--achievements"])}: Lista de finais obtidos.<br/>
-                               ${command(["--secrets"])}: Lista de segredos obtidos ${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}.<br/>
-                               ${command(["--whoami"])}: Exibe o nome atual.`;
+        const queryCommands = `${command([QTDOS_HELPC])}: Lista de comandos do sistema.<br/>
+                               ${command([QTDOS_ACHIEVEMENTC])}: Lista de finais obtidos.<br/>
+                               ${command([QTDOS_SECRC])}: Lista de segredos obtidos ${developing()}.<br/>
+                               ${command([QTDOS_WHOAMIC])}: Exibe o nome atual.
+                               `;
         
-        const modCommands = `${command(["__NAME", "seu nome"])}: Modifica seu nome no RPG.<br/>` 
+        const modCommands = `${command([QTDOS_MNAMEC, "seu nome"])}: Modifica seu nome no RPG. Digite "${QTDOS_MNAMEC} -h" para ver detalhes do comando.<br/>` 
         
-        const actionCommands = `${command(["start_rpg"])}: Inicia o jogo.<br/>
-                                ${command(["cls"])}: Limpa o console (fora do jogo).<br/>
-                                ${command(["restart"])}: Reinicia o QTDOS.<br>
-                                ${command(["shutdown"])}: Desliga o computador.<br/>
-                                `
+        const actionCommands = `${command([QTDOS_STARTRPGC])}: Inicia o jogo.<br/>
+                                ${command([QTDOS_CLSC])}: Limpa o console.<br/>
+                                ${command([QTDOS_RESTARTC])}: Reinicia o QTDOS.<br>
+                                ${command([QTDOS_SHUTDOWNC])}: Desliga o computador.<br/>
+                                `;
+        
+        const inGameCommands = `${command([QTDOS_EXITRPG])}: Encerra a execução do jogo.<br/>
+                                ${command([QTDOS_EFFECTRPG])}: Lista os efeitos ativos e os detalhes. ${developing()}.<br/>
+                                ${command([QTDOS_TRACKRPG])}: Retorna o histórico de opções escolhidas ${developing()}.<br/>`;
                             
         const response = `<p></p>
                             Consulta:<br/>
@@ -103,7 +116,9 @@ export class SystemQTDOSPrompt {
                             Modificação:<br/>
                                 ${tabulation(modCommands, 1, true)}<p></p>
                             Ação:<br/>
-                                ${tabulation(actionCommands, 1, true)}
+                                ${tabulation(actionCommands, 1, true)}<p></p>
+                            Durante o jogo (apenas estes funcionam durante o jogo):<br/>
+                                ${tabulation(inGameCommands, 1, true)}<p></p>
                             `;
         return response;
     } 
@@ -115,7 +130,7 @@ export class SystemQTDOSPrompt {
     static q_achievements(){
         appendPromptContent("<p>FINAIS JÁ ENCONTRADOS:</p>");
 
-        const discoveredFinals = rpgFinals.filter(f => f[1]);
+        const discoveredFinals = QTDOS_FINALS.filter(f => f[1]);
         let completeHTML = "<div>";
 
         for(let i = 0; i < discoveredFinals.length; i++){

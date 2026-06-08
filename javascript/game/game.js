@@ -1,26 +1,20 @@
-const FIRST_OPTION = 0;
-const SECOND_OPTION = 1;
-const THIRD_OPTION = 2;
-
 import { decisionTree } from "./decision_tree.js";
 
-import { 
-    togglePromptContent, 
+import {
     skipLineInPrompt,
-    appendPromptContent,
     skipParagraphInPrompt,
-    tabulation,
-    color
 } from "../utils.js";
 
 import { createSecretInput } from "../utils.js";
+import pathTypesProcedures from "./pathtypesProcedures.js";
 
 let exitGameLoopHandler = null;
-let gameRunning = false;
-let subtreeReference = { ...decisionTree };
+let subtreeReference = null;
 
 function gameLog(text){
-    document.body.innerHTML += `<span>${text}</span>`;
+    const span = document.createElement('span');
+    span.textContent = text;
+    document.body.appendChild(span);
 
     skipParagraphInPrompt();
 }
@@ -31,7 +25,7 @@ function sendGameCommand(inputValue){
 
     currentActiveEntry.innerHTML = `${gameTrack}${inputValue}`;
 
-    if(inputValue === "exit"){
+    if(inputValue === QTDOS_EXITRPG){
         exitGameLoopHandler();
         return;
     }
@@ -39,13 +33,11 @@ function sendGameCommand(inputValue){
     const subtreeKeys = Object.keys(subtreeReference.paths);
     const nInputValue = Number(inputValue);
 
-
     if(nInputValue != NaN) {
-        if(nInputValue == FIRST_OPTION
-        || nInputValue == SECOND_OPTION
-        || nInputValue == THIRD_OPTION){
+        if(nInputValue >= 0
+        || nInputValue <= 2){
             subtreeReference = subtreeReference.paths[nInputValue];
-
+            
             walk()
             return;
         }
@@ -77,36 +69,38 @@ function waitGameCommand(){
 }
 
 function walk(sub = null){
-    if(Object.hasOwn(subtreeReference, "itsFinal")){
-        appendPromptContent(`<div>Final desbloqueado: ${color(subtreeReference.itsFinal.achievement, QTDOSPROCESS_HEXCOLOR)}</div>`);
-        appendPromptContent(`<span>${subtreeReference.itsFinal.finalMessage}</span>`);
-        skipLineInPrompt();
+    const pathType = subtreeReference.type;
+    console.log(pathType);
+    
+    const itsKnownPathtype = Object.hasOwn(pathTypesProcedures, pathType);
+
+    if(itsKnownPathtype){
+        const { keepLoop, fork } = pathTypesProcedures[pathType](subtreeReference);
         
-        subtreeReference = { ...decisionTree };
-        skipParagraphInPrompt();
+        if(keepLoop){
+            if(fork != null) {
+               subtreeReference = { ...subtreeReference.cases[fork] }
+               walk(); 
+               return;
+            }
 
-        exitGameLoopHandler();
-        return
+            waitGameCommand();
+        }else{
+            exitGameLoopHandler();
+            return;
+        }
     }else{
-        appendPromptContent(`<span>${subtreeReference.message}</span>`);
-
-        const currentPaths = Object.keys(subtreeReference.paths);
-        const choiceOptions = `<div>0 - ${subtreeReference.paths[0].optionMessage}</div>
-                               <div>1 - ${subtreeReference.paths[1].optionMessage}</div>
-                               <div>2 - ${subtreeReference.paths[2].optionMessage}</div>`;
-            
-        appendPromptContent(tabulation(choiceOptions, 1, true));
-        skipLineInPrompt();
-
+        console.log("Ocorreu um erro: o tipo do caminho escolhido não é resolvível");
+        exitGameLoopHandler();
     }   
-
-    waitGameCommand();
 }
 
 export function gameStart(){ 
-    return new Promise((resolve, reject) => {
-        exitGameLoopHandler = resolve;
+    subtreeReference = { ...decisionTree };
 
+    return new Promise((resolve, reject) => {
+        exitGameLoopHandler = resolve  
+        
         walk();
     });
 }

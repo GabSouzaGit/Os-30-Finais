@@ -32,7 +32,7 @@ export function greetings(){
     const QTDOS_GREETINGS = `${color("Seja bem vindo ao QTDOS!", QTDOSHEAL_HEXCOLOR)}<br/>
                                  ${color("Versão 1.0.05.7x64", QTDOSPROCESS_HEXCOLOR)}<br/>
                                  Todos os direitos reservados.<p></p>
-                                 Digite --help ou -h para ver os possiveis comandos.<p></p>`;
+                                 Digite ${QTDOS_HELPC} para ver todos os comandos.<p></p>`;
 
     return QTDOS_GREETINGS;
 }
@@ -106,6 +106,17 @@ export function createSecretInput(eventHandler){
                          
             document.removeEventListener("keypress", handlerWrapper);
             input.removeEventListener("input", keyPressingSoundHandler);
+
+            if(input.value != ""){
+                commandHistory.push(input.value);
+                historyIndex = commandHistory.length;
+    
+                if(commandHistory.length > 10){
+                    commandHistory.shift();
+                    historyIndex--;
+                    return;
+                }
+            }
         }
     }
     
@@ -117,4 +128,17 @@ export function createSecretInput(eventHandler){
     secretInput.autocomplete = "off";
 
     return secretInput;
+}
+
+/**
+ * 
+ * @param {number} percentual Numero entre 1 e 0 que represente a chance de um retorno verdadeiro.
+ * @returns {boolean} Valor verdadeiro de ocorrer tal possibilidade, senão, falso.
+ */
+export function chance(percentual){
+    if (percentual > 1 || percentual < 0) {
+        throw new Error('O percentual precisa ser um numero entre 0 e 1');
+    }
+
+    return Math.random() < percentual;
 }

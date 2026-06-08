@@ -6,7 +6,6 @@ const turnOnButton = document.querySelector("#turn-on-button");
 
 async function bootSystemHandler(){
     SystemQTDOSManagement.defineCookieSession();
-
     const firstAccess = SystemQTDOSManagement.isFirstAcess();
     
     await SystemQTDOSSetuping.turnOnPC();
@@ -35,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if(SystemQTDOSManagement.cookieExists()){
+        document.body.classList.remove("body-before-init");
         boot();
     }
 });

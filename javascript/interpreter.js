@@ -12,26 +12,42 @@ import { color } from "./utils.js";
 
 import { SystemQTDOSManagement, SystemQTDOSPrompt, SystemQTDOSSound } from "./system/SystemQTDOS.js";
 
-const modificationTable = {
-    // Comandos de modificação (funções)
-    "__NAME":           SystemQTDOSPrompt.m_name,
-}
+function setupCommandsFromGlobals(){
+    const modifications = [
+        [ QTDOS_MNAMEC,         SystemQTDOSPrompt.m_name]
+    ];
 
-const commandTable = {
-    // Comandos de consulta (funções)
-    "--help":           SystemQTDOSPrompt.q_helpList,
-    "-h":               SystemQTDOSPrompt.q_helpList,
-    "--achievements":   SystemQTDOSPrompt.q_achievements,
-    "--whoami":         SystemQTDOSPrompt.q_whoami,
+    const commands = [
+        [ QTDOS_HELPC,          SystemQTDOSPrompt.q_helpList],
+        [ QTDOS_ACHIEVEMENTC,   SystemQTDOSPrompt.q_achievements],
+        [ QTDOS_SECRC,          () => {}],
+        [ QTDOS_WHOAMIC,        SystemQTDOSPrompt.q_whoami],
+        [ QTDOS_STARTRPGC,      gameStart],
+        [ QTDOS_CLSC,           SystemQTDOSPrompt.a_cls],
+        [ QTDOS_RESTARTC,       SystemQTDOSPrompt.a_restart],
+        [ QTDOS_SHUTDOWNC,      SystemQTDOSPrompt.a_shutdown],
+    ]
 
-    // Comandos de ação (procedimentos)
-    "start_rpg":        gameStart,
-    "cls":              SystemQTDOSPrompt.a_cls,
-    "restart":          SystemQTDOSPrompt.a_restart,
-    "shutdown":         SystemQTDOSPrompt.a_shutdown,
+    const COMMAND_FLAG = 0;
+    const COMMAND_EXEC = 1;
 
-    // Opções de desenvolvedor
-    "**dev-opt[flush]": () => {
+    const commandTable      = {},
+          modificationTable = {};
+
+    for(let i = 0; i < modifications.length; i++){
+        modificationTable[
+            modifications[i][COMMAND_FLAG]
+        ] = modifications[i][COMMAND_EXEC];
+    }
+
+    for(let i = 0; i < commands.length; i++){
+        commandTable[
+            commands[i][COMMAND_FLAG]
+        ] = commands[i][COMMAND_EXEC];
+    }
+
+    // TEMP
+    commandTable["**dev-opt[flush]"] = () => {
         const storagelen = localStorage.length;
 
         for(let i = 0; i < storagelen; i++){
@@ -46,11 +62,19 @@ const commandTable = {
         SystemQTDOSManagement.destroyCookieSession();
         window.location.reload();
     }
+    /* -- */
+
+    return {
+        commandTable,
+        modificationTable
+    }
 }
+
+const { commandTable, modificationTable } = setupCommandsFromGlobals();
 
 function defaultPromptErrorMessage(inputValue){
     appendPromptContent(`Parece que "${inputValue}" não é um comando reconhecido pelo sistema operacional.
-                        <br/> Digite --help para mais informações.`);
+                        <br/> Digite ${QTDOS_HELPC} para mais informações.`);
 
     skipParagraphInPrompt(); 
 }
@@ -75,8 +99,6 @@ async function sendCommandEvent(inputValue){
                     result = commandTable[flag]();
                     appendPromptContent(result);
                 }
-
-                console.log(flag);
                 
                 if(flag.startsWith("--")) skipLineInPrompt();
 
@@ -106,8 +128,6 @@ export function waitSystemCommand(){
     divInput.appendChild(track);
     divInput.appendChild(secretInput);
     document.body.appendChild(divInput);
-    
-    skipLineInPrompt();
 
     window.scrollTo(0, document.body.scrollHeight);
     
