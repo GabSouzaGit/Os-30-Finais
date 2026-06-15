@@ -5,6 +5,7 @@ const QTDOSPROCESS_HEXCOLOR     = "#fbff00";
 const QTDOSHEAL_HEXCOLOR        = "#09ff00";
 const QTDOSCRITICAL_HEXCOLOR    = "#ff5757";
 const QTDOSSPECIAL_HEXCOLOR     = "#00f7ff";
+const QTDOSDEV_HEXCOLOR         = "#08fca3";
 
 const QTDOS_HELPC               = "-h"
 const QTDOS_ACHIEVEMENTC        = "-ach";
@@ -21,6 +22,8 @@ const QTDOS_SHUTDOWNC           = "shutdown";
 const QTDOS_EXITRPG             = "/exit";
 const QTDOS_EFFECTRPG           = "/effect";
 const QTDOS_TRACKRPG            = "/track";
+
+const QTDOS_FMTDEV              = "$_FMT";
 
 // [final, pego/restante]
 const QTDOS_FINALS = [
@@ -67,7 +70,9 @@ const QTDOS_FINALS = [
     },
 ]
 
-let systemTrack = "C:\\QTDOS\\system32>";
-let gameTrack = "C:\\qtdosgame>"
+const systemTrack = "C:\\QTDOS\\system32>";
+const gameTrack = "C:\\qtdosgame>"
+
+let username;
 let commandHistory = [];
 let historyIndex = 0;

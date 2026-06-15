@@ -47,19 +47,18 @@ function setupCommandsFromGlobals(){
     }
 
     // TEMP
-    commandTable["**dev-opt[flush]"] = () => {
-        const storagelen = localStorage.length;
+    commandTable[QTDOS_FMTDEV] = () => {
+        const arrayFromLocalStorage = [];
 
-        for(let i = 0; i < storagelen; i++){
+        for(let i = 0; i < localStorage.length; i++){
             const local = localStorage.key(i);
             
-            console.log(local);
-
-            if(local == null) continue;
-            if(local.startsWith("QTDOS")) localStorage.removeItem(local);
+            if(local.startsWith("QTDOS")) arrayFromLocalStorage.push(local);
         }
 
+        arrayFromLocalStorage.map(key => localStorage.removeItem(key));
         SystemQTDOSManagement.destroyCookieSession();
+        
         window.location.reload();
     }
     /* -- */

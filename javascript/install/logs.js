@@ -16,13 +16,11 @@ async function buildPromptAnimation(){
     const spanLoading = document.querySelector("#temp-prompt-building");
 
     return new Promise((resolve) => {
-        const mms = 300;
+        const mms = 200;
         let loadingControll = 0;
         let charIterator = 0;
 
-        let itn = setInterval(() => {
-            console.log(loadingControll);
-            
+        let itn = setInterval(() => {         
             charIterator = charIterator == racingLoad.length ? 0 : charIterator;
             const loadChar = racingLoad[charIterator];
             spanLoading.textContent = `${loadChar} - Construindo cliente de prompt.`;

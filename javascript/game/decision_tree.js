@@ -5,7 +5,7 @@ export const decisionTree = {
         {
             type: "common",
             optionMessage: "Iniciar na caverna.",
-            message: "Você acorda numa caverna escura. É frio, úmido e sua voz ecoa pelas paredes cinzas.",
+            message: `Você acorda numa caverna escura. É frio, úmido e sua voz ecoa pelas paredes cinzas.`,
             paths: [
                 {
                     type: "final",

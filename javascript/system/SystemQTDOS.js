@@ -33,6 +33,10 @@ function command(commandsep){
         return color(commandsep[0], QTDOSSPECIAL_HEXCOLOR);
     }
 
+    if(commandsep[0].startsWith("$_")){
+        return color(commandsep[0], QTDOSDEV_HEXCOLOR);
+    }
+
     return color(commandsep[0], QTDOSCRITICAL_HEXCOLOR);
 }
 
@@ -106,10 +110,14 @@ export class SystemQTDOSPrompt {
                                 ${command([QTDOS_SHUTDOWNC])}: Desliga o computador.<br/>
                                 `;
         
-        const inGameCommands = `${command([QTDOS_EXITRPG])}: Encerra a execução do jogo.<br/>
+                                
+                                const inGameCommands = `${command([QTDOS_EXITRPG])}: Encerra a execução do jogo.<br/>
                                 ${command([QTDOS_EFFECTRPG])}: Lista os efeitos ativos e os detalhes. ${developing()}.<br/>
                                 ${command([QTDOS_TRACKRPG])}: Retorna o histórico de opções escolhidas ${developing()}.<br/>`;
-                            
+                                
+        const devCommands = `${command([QTDOS_FMTDEV])}: Limpa TUDO (sério, não brinque com ele (ó﹏ò｡) ).<br/>
+                             `;
+
         const response = `<p></p>
                             Consulta:<br/>
                                 ${tabulation(queryCommands, 1, true)}<p></p>
@@ -119,12 +127,14 @@ export class SystemQTDOSPrompt {
                                 ${tabulation(actionCommands, 1, true)}<p></p>
                             Durante o jogo (apenas estes funcionam durante o jogo):<br/>
                                 ${tabulation(inGameCommands, 1, true)}<p></p>
+                            Opções de desenvolvedor (use por conta e risco):<br/>
+                                ${tabulation(devCommands, 1, true)}<p></p>
                             `;
         return response;
     } 
 
     static q_whoami(){
-        return SystemQTDOSManagement.getUsername();
+        return username;
     }
 
     static q_achievements(){
@@ -288,9 +298,16 @@ export class SystemQTDOSManagement {
         const ready = () => {
             document.removeEventListener('keypress', ready);
             document.removeEventListener('click', ready);
+            
+            if(installation) {
+                SystemQTDOSManagement.giveBasicUserProfile();
+                localStorage.setItem(SystemQTDOSManagement.QTDOS_HAS_INSTALLED_MEMKEY, '1');
 
-            if(installation) localStorage.setItem(SystemQTDOSManagement.QTDOS_HAS_INSTALLED_MEMKEY, '1');
+                resolve();
+                return;
+            }
 
+            SystemQTDOSManagement.recoveryUserData();
             resolve();
         }
 
@@ -333,15 +350,22 @@ export class SystemQTDOSManagement {
 
     static giveBasicUserProfile(){
         if(localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY) == undefined){
-            localStorage.setItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY, "guest");
+            SystemQTDOSManagement.editUsername("guest");
         }
+
+        SystemQTDOSManagement.recoveryUserData();
     }
 
     static editUsername(name){
         localStorage.setItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY, name);
+        username = localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY);
     }
 
     static getUsername(){
-        return localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY);
+        return username;
+    }
+
+    static recoveryUserData(){
+        username = localStorage.getItem(SystemQTDOSManagement.QTDOS_USERNAME_KEY);
     }
 }

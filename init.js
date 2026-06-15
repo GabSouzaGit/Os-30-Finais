@@ -13,12 +13,11 @@ async function bootSystemHandler(){
     document.body.classList.remove("body-before-init");
     togglePromptContent();
 
-    SystemQTDOSManagement.giveBasicUserProfile();
-
     if(firstAccess) await SystemQTDOSSetuping.install(); 
     else            await SystemQTDOSSetuping.setup();
 
     SystemQTDOSManagement.defineCookieSession();
+    
     boot();
 }
 
@@ -35,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if(SystemQTDOSManagement.cookieExists()){
         document.body.classList.remove("body-before-init");
+        SystemQTDOSManagement.recoveryUserData();
         boot();
     }
 });
