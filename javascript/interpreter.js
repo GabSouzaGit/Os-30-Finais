@@ -10,7 +10,9 @@ import {
 import { gameStart } from "./game/game.js";
 import { color } from "./utils.js";
 
-import { SystemQTDOSManagement, SystemQTDOSPrompt, SystemQTDOSSound } from "./system/SystemQTDOS.js";
+import SystemQTDOSManagement from "./system/SystemQTDOSManagement.js";
+import SystemQTDOSPrompt from "./system/SystemQTDOSPrompt.js";
+import SystemQTDOSSound from "./system/SystemQTDOSSound.js";
 
 function setupCommandsFromGlobals(){
     const modifications = [

@@ -1,6 +1,8 @@
 import { boot } from "./javascript/boot.js";
 import { togglePromptContent } from "./javascript/utils.js";
-import { SystemQTDOSManagement, SystemQTDOSSetuping } from "./javascript/system/SystemQTDOS.js";
+
+import SystemQTDOSManagement from "./javascript/system/SystemQTDOSManagement.js";
+import SystemQTDOSSetuping from "./javascript/system/SystemQTDOSSetuping.js";
 
 const turnOnButton = document.querySelector("#turn-on-button");
 

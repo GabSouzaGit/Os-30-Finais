@@ -3,21 +3,18 @@ import { decisionTree } from "./decision_tree.js";
 import {
     skipLineInPrompt,
     skipParagraphInPrompt,
+    appendPromptContent
 } from "../utils.js";
 
 import { createSecretInput } from "../utils.js";
 import pathTypesProcedures from "./pathtypesProcedures.js";
 
+import SystemQTDOSGameCommands from "../system/SystemQTDOSGameCommands.js";
+
+const inGameCommandsActions = SystemQTDOSGameCommands.setupGameCommands();
+
 let exitGameLoopHandler = null;
 let subtreeReference = null;
-
-function gameLog(text){
-    const span = document.createElement('span');
-    span.textContent = text;
-    document.body.appendChild(span);
-
-    skipParagraphInPrompt();
-}
 
 function sendGameCommand(inputValue){    
     const currentActiveEntry = document.querySelector("#game-entry");
@@ -30,22 +27,34 @@ function sendGameCommand(inputValue){
         return;
     }
 
-    const subtreeKeys = Object.keys(subtreeReference.paths);
-    const nInputValue = Number(inputValue);
+    const actionCommand = SystemQTDOSGameCommands.gameCommandAssoc(
+        inGameCommandsActions,
+        inputValue
+    );
 
-    if(nInputValue != NaN) {
-        if(nInputValue >= 0
-        || nInputValue <= 2){
-            subtreeReference = subtreeReference.paths[nInputValue];
-            
-            walk()
-            return;
-        }
-
-        gameLog("Insira um valor dentro das opções.");
+    if(actionCommand.exists){
+        actionCommand.action({ 
+            subtree: subtreeReference 
+        });
     }else{
-        gameLog("Insira um valor dentro das opções.");
+        const subtreeKeys = Object.keys(subtreeReference.paths);
+        const nInputValue = Number(inputValue);
+    
+        if(nInputValue != NaN) {
+            if(nInputValue >= 0
+            || nInputValue <= 2){
+                subtreeReference = subtreeReference.paths[nInputValue];
+                
+                walk()
+                return;
+            }
+    
+            appendPromptContent("Insira um valor dentro das opções.");
+        }else{
+            appendPromptContent("Insira um valor dentro das opções.");
+        }
     }
+
 
     waitGameCommand();
 }

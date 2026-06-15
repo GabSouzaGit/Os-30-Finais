@@ -1,5 +1,6 @@
 const QTDOSTAB_MULTIPLIER       = 20;
 
+// Cores do sistema
 const QTDOSTIMEMS_HEXCOLOR      = "#d400ff";
 const QTDOSPROCESS_HEXCOLOR     = "#fbff00";
 const QTDOSHEAL_HEXCOLOR        = "#09ff00";
@@ -7,23 +8,32 @@ const QTDOSCRITICAL_HEXCOLOR    = "#ff5757";
 const QTDOSSPECIAL_HEXCOLOR     = "#00f7ff";
 const QTDOSDEV_HEXCOLOR         = "#08fca3";
 
+/* Comandos exclusivos do console */
+// Comandos de consulta
 const QTDOS_HELPC               = "-h"
 const QTDOS_ACHIEVEMENTC        = "-ach";
 const QTDOS_SECRC               = "-secr";
 const QTDOS_WHOAMIC             = "-whoami";
 
+// Comandos de modificação
 const QTDOS_MNAMEC              = "__NAME";
 
+// Comandos de ação
 const QTDOS_STARTRPGC           = "start_rpg";
 const QTDOS_CLSC                = "cls";
 const QTDOS_RESTARTC            = "restart";
 const QTDOS_SHUTDOWNC           = "shutdown";
 
-const QTDOS_EXITRPG             = "/exit";
-const QTDOS_EFFECTRPG           = "/effect";
-const QTDOS_TRACKRPG            = "/track";
-
+// Comandos de desenvolvimento
 const QTDOS_FMTDEV              = "$_FMT";
+
+// Comandos de jogo
+const QTDOS_EXITRPG             = "/exit";
+const QTDOS_EFFECTRPG           = "/effects";
+const QTDOS_TRACKRPG            = "/track";
+const QTDOS_REPEATRPG           = "/repeat";
+const QTDOS_REPEATRPG_CFLAG     = "/repeat -c";
+
 
 // [final, pego/restante]
 const QTDOS_FINALS = [

@@ -1,4 +1,4 @@
-import { SystemQTDOSSound } from "./system/SystemQTDOS.js";
+import SystemQTDOSSound from "./system/SystemQTDOSSound.js";
 
 /**
  * 
@@ -62,8 +62,16 @@ export function togglePromptContent(html = ""){
     document.body.innerHTML = html;
 }
 
+/**
+ * @description Insere um novo conteúdo no documento, abaixo dos demais.
+ * @param {string} html Conteúdo HTML ou texto que será adicionado.
+ */
 export function appendPromptContent(html){
-    document.body.innerHTML += html;
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    document.body.appendChild(span);
+
+    skipParagraphInPrompt();
 }
 
 /**
@@ -141,4 +149,53 @@ export function chance(percentual){
     }
 
     return Math.random() < percentual;
+}
+
+/**
+ * 
+ * @description Retorna o texto comando colorido de acordo com o prefixo e a adicional dele (parametro, flag, etc;)
+ * @param {string[]} commandsep Um array contendo o comando (indice 0) e os demais parametros.
+ * 
+ */
+export function command(commandsep){
+    if(commandsep.length == 2){
+        if(commandsep[0].startsWith("__")){
+            const mod = `${color(commandsep[0], QTDOSTIMEMS_HEXCOLOR)} ${color(commandsep[1], QTDOSPROCESS_HEXCOLOR)}`;
+            return mod;
+        }
+    }
+
+    if(commandsep[0].startsWith("--") 
+    || commandsep[0].startsWith("-")){
+        return color(commandsep[0], QTDOSPROCESS_HEXCOLOR);
+    }
+
+    if(commandsep[0].startsWith("/")){
+        return color(commandsep[0], QTDOSSPECIAL_HEXCOLOR);
+    }
+
+    if(commandsep[0].startsWith("$_")){
+        return color(commandsep[0], QTDOSDEV_HEXCOLOR);
+    }
+
+    return color(commandsep[0], QTDOSCRITICAL_HEXCOLOR);
+}
+
+/**
+ * 
+ * @description Devolve sinalização de desenvolvimento para qualquer texto.
+ */
+export function developing(){
+    return `${color("(em desenvolvimento)", QTDOSHEAL_HEXCOLOR)}`;
+}
+
+/**
+ * 
+ * @param {string} url URL do arquivo.
+ * @returns Retorna a URL relativa do caminho para acesso de arquivos.
+ */
+export function relativeURL(url){
+    const rurl = new URL(url, import.meta.url);
+    
+    return rurl.href;
 }
